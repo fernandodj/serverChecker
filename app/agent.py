@@ -1,20 +1,21 @@
 import subprocess
 import json
+import pprint
 import platform
 import requests
 
 def main():
         os_info = getOSData()
         data = {
-                "process_data": getProcessData(),
-                "os_name": os_info['name'],
-                "os_version": os_info['version'],
-                "users": getUsersData(),
-                "cpu": getCPUData()
+                "ProcessData": getProcessData(),
+                "OsName": os_info['name'],
+                "OsVersion": os_info['version'],
+                "Users": getUsersData(),
+                "Cpu": getCPUData()
         } 
 
-        #doRequest(data)
-        print(json.dumps(data)) 
+        #print(json.dumps(data))
+        doRequest(json.dumps(data))
 
 
 def doRequest(server_data):
@@ -36,14 +37,14 @@ def getCPUData():
         return cpu_data
 
 def getUsersData():
-        output = subprocess.Popen(["who | awk 'BEGIN {print \"NAME LINE DATE HOUR\"} {if(NR > 1) print $1, $2, $3, $4}'"], stdout=subprocess.PIPE, shell=True).stdout.readlines()
+        output = subprocess.Popen(["who | awk 'BEGIN {print \"Name Line Date Hour\"} {if(NR > 1) print $1, $2, $3, $4}'"], stdout=subprocess.PIPE, shell=True).stdout.readlines()
         headers = [h for h in ' '.join(output[0].strip().split()).split() if h]
         raw_data = map(lambda s: s.strip().split(None, len(headers) - 1), output[1:])
         return [dict(zip(headers, r)) for r in raw_data]
     
     
 def getProcessData():
-        output = subprocess.Popen(['ps', '-l'], stdout=subprocess.PIPE).stdout.readlines()
+        output = subprocess.Popen(["ps -eo pid,ppid,user,time,%mem=MEM_PERC,%cpu=CPU_PERC,cmd --sort=-%cpu | head"], stdout=subprocess.PIPE, shell=True).stdout.readlines()
         headers = [h for h in ' '.join(output[0].strip().split()).split() if h]
         raw_data = map(lambda s: s.strip().split(None, len(headers) - 1), output[1:])
         return [dict(zip(headers, r)) for r in raw_data]
