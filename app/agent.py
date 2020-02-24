@@ -1,6 +1,5 @@
 import subprocess
 import json
-import pprint
 import platform
 import requests
 
@@ -13,8 +12,7 @@ def main():
                 "Users": getUsersData(),
                 "Cpu": getCPUData()
         } 
-
-        #print(json.dumps(data))
+        
         doRequest(json.dumps(data))
 
 
